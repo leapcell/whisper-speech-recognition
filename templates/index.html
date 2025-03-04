@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000;
+            --text-color: #ffe3f1;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .btn {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ffcdd2;
+        }
+    </style>
+    <script>
+        function recognizeAudio(fileName) {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = '/';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'example_audio';
+            input.value = fileName;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+</head>
+
+<body class="min-h-screen flex justify-center items-center">
+    <div class="container mx-auto p-8 bg-gray-900 rounded-lg shadow-lg w-full max-w-4xl">
+        <h1 class="text-2xl font-bold text-center mb-6">Speech Recognition</h1>
+        <p class="text-center mb-4">You can either select a preset audio below or upload your own audio file for speech
+            recognition.</p>
+        <div class="mb-8">
+            <h3 class="text-xl font-bold mb-3">Preset Audios</h3>
+            <div class="flex flex-col space-y-3">
+                {% for audio in example_audios %}
+                <div class="flex items-center space-x-3">
+                    <audio controls class="w-1/2">
+                        <source src="{{ url_for('static', filename='audio_files/' + audio.filename) }}"
+                            type="audio/mpeg">
+                        Your browser does not support audio playback.
+                    </audio>
+                    <div>
+                        <p class="text-sm mb-1">{{ audio.description }}</p>
+                        <button onclick="recognizeAudio('{{ audio.filename }}')"
+                            class="flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium btn">
+                            Recognize This Audio
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label for="audio_file" class="block text-sm font-medium">Upload Audio File</label>
+                    <input type="file" id="audio_file" name="audio_file"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
+                </div>
+                <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium btn">
+                    Upload and Recognize
+                </button>
+            </form>
+        </div>
+        {% if result %}
+        <div class="mt-8">
+            <h3 class="text-xl font-bold mb-3">Recognition Result</h3>
+            <p class="whitespace-pre-wrap">{{ result }}</p>
+            <p class="mt-2">Audio Duration: {{ audio_duration }} seconds</p>
+            <p class="mt-2">File Size: {{ file_size }} bytes</p>
+            <p class="mt-2">Recognition Time: {{ recognition_time }} seconds</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
