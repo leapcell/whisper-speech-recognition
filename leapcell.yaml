@@ -1,5 +1,5 @@
 runtime: python
-startCommand: gunicorn main:app -b :8080
+startCommand: gunicorn -w 1 -b :8080 main:app
 buildCommand: sh prepare_env.sh
 port: 8080
 memory: 2048mb
