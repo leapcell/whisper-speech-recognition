@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template
-import os
-import tempfile
+import io
 import time
 from download_model import load_whisper_model
 
@@ -38,17 +37,16 @@ def index():
         example_audio = request.form.get("example_audio")
         if example_audio:
             # Construct the file path for the selected example audio
-            file_path = os.path.join("static", "audio_files", example_audio)
+            file_path = f"static/audio_files/{example_audio}"
+            with open(file_path, "rb") as f:
+                audio_data = f.read()
         else:
             # Get the uploaded audio file
             audio_file = request.files.get("audio_file")
             if audio_file:
-                # Create a temporary file to save the uploaded audio
-                with tempfile.NamedTemporaryFile(
-                    delete=False, suffix=".wav"
-                ) as temp_audio:
-                    audio_file.save(temp_audio.name)
-                    file_path = temp_audio.name
+                # Read file into memory
+                audio_data = audio_file.read()
+                file_size = len(audio_data)
             else:
                 # Render the template without a result if no audio is provided
                 return render_template(
@@ -66,23 +64,17 @@ def index():
         try:
             # Load the Whisper model (using the 'base' model here, can choose others)
             model = load_whisper_model()
-            # Perform speech recognition on the audio file
-            result_data = model.transcribe(file_path)
+            # Perform speech recognition on the audio file from memory
+            result_data = model.transcribe(io.BytesIO(audio_data))
             # Extract the transcribed text from the result
             result = result_data["text"]
         except Exception as e:
             # Handle errors during speech recognition
             result = f"Speech recognition error: {e}"
-        finally:
-            # Delete the temporary audio file if it exists
-            if "temp_audio" in locals():
-                os.remove(temp_audio.name)
 
         # Record the end time and calculate the recognition duration
         end_time = time.time()
         recognition_time = round(end_time - start_time, 2)
-        # Get the size of the audio file
-        file_size = os.path.getsize(file_path)
 
     # Render the template with the result and other information
     return render_template(

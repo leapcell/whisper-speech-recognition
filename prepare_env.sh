@@ -3,6 +3,7 @@
 # Exit immediately if a command exits with a non - zero status
 set -e
 
+echo "Preparing the environment..."
 # Install Flask, python - multipart and Gunicorn
 pip install flask python-multipart gunicorn
 
@@ -15,4 +16,5 @@ pip install -U openai-whisper
 
 # Run a Python script to download the necessary Whisper model
 # This script will download the model in build step
+echo "Downloading the Whisper model..."
 python download_model.py
