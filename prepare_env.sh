@@ -3,6 +3,9 @@
 # Exit immediately if a command exits with a non - zero status
 set -e
 
+echo "Installing ffmpeg..."
+apt-get update && apt-get install -y ffmpeg
+
 echo "Preparing the environment..."
 # Install Flask, python - multipart and Gunicorn
 pip install flask python-multipart gunicorn
