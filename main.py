@@ -70,8 +70,11 @@ def index():
         start_time = time.time()
 
         try:
+            start_load_time = time.time()
             # Load the Whisper model (using the 'base' model here, can choose others)
             model = load_whisper_model()
+            end_load_time = time.time()
+            print(f"Model loading time: {end_load_time - start_load_time:.2f} seconds")
             # Perform speech recognition on the audio file from memory
             result_data = model.transcribe(file_path)
             # Extract the transcribed text from the result
