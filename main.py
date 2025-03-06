@@ -2,7 +2,6 @@ from flask import Flask, request, render_template
 import io
 import time
 from download_model import load_whisper_model
-
 # Import the Whisper library for speech recognition
 import whisper
 
@@ -57,6 +56,15 @@ def index():
                     file_size=file_size,
                     recognition_time=recognition_time,
                 )
+        
+        # save the audio data to a file
+        # This is necessary because Whisper requires a file path to the audio file
+        # Leapcell's environment does not allow writing to the filesystem
+        # Only the /tmp folder is writable
+        folder = "/tmp"
+        file_path = f"{folder}/audio_file.wav"
+        with open(file_path, "wb") as f:
+            f.write(audio_data)
 
         # Record the start time for measuring recognition duration
         start_time = time.time()
@@ -65,7 +73,7 @@ def index():
             # Load the Whisper model (using the 'base' model here, can choose others)
             model = load_whisper_model()
             # Perform speech recognition on the audio file from memory
-            result_data = model.transcribe(io.BytesIO(audio_data))
+            result_data = model.transcribe(file_path)
             # Extract the transcribed text from the result
             result = result_data["text"]
         except Exception as e:
