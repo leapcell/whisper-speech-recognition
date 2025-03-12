@@ -1,25 +1,22 @@
 from flask import Flask, request, render_template
 import io
 import time
-from download_model import load_whisper_model
-# Import the Whisper library for speech recognition
-import whisper
 
 app = Flask(__name__)
 
 # Configure example audio file information with descriptions
 EXAMPLE_AUDIOS = [
     {
-        "filename": "audio1.mp3",
-        "description": "This is a sample audio about nature sounds.",
+        "filename": "demo.wav",
+        "description": "English speech about technology.",
     },
     {
-        "filename": "audio2.mp3",
-        "description": "This audio contains a short speech about technology.",
+        "filename": "audio_samples_de-DE_sample.wav",
+        "description": "This is a German audio sample.",
     },
     {
-        "filename": "audio3.mp3",
-        "description": "An audio recording of a beautiful song.",
+        "filename": "jp-audio.wav",
+        "description": "This is a Japanese audio sample.",
     },
 ]
 
@@ -32,6 +29,11 @@ def index():
     recognition_time = 0
 
     if request.method == "POST":
+        from download_model import load_whisper_model
+
+        # Import the Whisper library for speech recognition
+        import whisper
+
         # Check if an example audio is selected
         example_audio = request.form.get("example_audio")
         if example_audio:
@@ -56,7 +58,7 @@ def index():
                     file_size=file_size,
                     recognition_time=recognition_time,
                 )
-        
+
         # save the audio data to a file
         # This is necessary because Whisper requires a file path to the audio file
         # Leapcell's environment does not allow writing to the filesystem
